@@ -1,0 +1,61 @@
+%% Open Brain — End-to-end system architecture
+%% How capture sources, the database, the MCP layer, and AI clients fit together.
+
+flowchart LR
+    subgraph Capture["Capture Sources"]
+        Slack["Slack messages"]
+        Discord["Discord messages"]
+        Imports["Bulk imports<br/>(ChatGPT, Gmail,<br/>Obsidian, X, etc.)"]
+        Direct["Direct writes<br/>from AI clients"]
+    end
+
+    subgraph Core["Open Brain Core"]
+        EdgeIn["Capture Edge<br/>Functions"]
+        Embed["OpenRouter<br/>embedding gateway"]
+        DB[("Supabase Postgres<br/>+ pgvector<br/>thoughts table")]
+        MCP["Remote MCP server<br/>(Supabase Edge Function)"]
+    end
+
+    subgraph Clients["AI Clients"]
+        ClaudeDesk["Claude Desktop"]
+        ChatGPT["ChatGPT"]
+        ClaudeCode["Claude Code"]
+        Cursor["Cursor"]
+        Other["Any MCP-aware<br/>client"]
+    end
+
+    subgraph Surfaces["Frontends & Surfaces"]
+        Dash["Dashboards<br/>(SvelteKit / Next.js)"]
+        Digest["Daily digests<br/>(email / Slack)"]
+        Briefing["Life Engine<br/>briefings"]
+    end
+
+    Slack --> EdgeIn
+    Discord --> EdgeIn
+    Imports --> EdgeIn
+    Direct --> MCP
+
+    EdgeIn --> Embed
+    Embed --> DB
+    EdgeIn --> DB
+
+    DB <--> MCP
+    DB --> Dash
+    DB --> Digest
+    DB --> Briefing
+
+    MCP <--> ClaudeDesk
+    MCP <--> ChatGPT
+    MCP <--> ClaudeCode
+    MCP <--> Cursor
+    MCP <--> Other
+
+    classDef core fill:#1E88E5,stroke:#0D47A1,color:#fff
+    classDef capture fill:#43A047,stroke:#1B5E20,color:#fff
+    classDef client fill:#FB8C00,stroke:#E65100,color:#fff
+    classDef surface fill:#8E24AA,stroke:#4A148C,color:#fff
+
+    class EdgeIn,Embed,DB,MCP core
+    class Slack,Discord,Imports,Direct capture
+    class ClaudeDesk,ChatGPT,ClaudeCode,Cursor,Other client
+    class Dash,Digest,Briefing surface

@@ -1,0 +1,39 @@
+%% Open Brain contribution flow
+%% From an idea to a merged PR, including the non-technical path.
+
+flowchart TB
+    Idea(["You have an idea<br/>or workflow worth sharing"])
+
+    Path{"Can you code it?"}
+
+    NonTech["Open a Non-Technical<br/>Contribution issue<br/>Describe the workflow in plain language"]
+    Mentor["A community mentor<br/>picks it up and<br/>co-authors the PR"]
+
+    Code["Build it against your own<br/>Open Brain instance first"]
+    Folder["Place it in the right category folder<br/>recipes, schemas, dashboards,<br/>integrations, or skills"]
+    Files["Add README.md and metadata.json<br/>No secrets, no binaries over 1MB,<br/>no destructive SQL"]
+    PR["Open a PR titled<br/>[category] Short description"]
+
+    Auto["Automated review agent runs:<br/>folder structure, metadata schema,<br/>secrets scan, SQL safety,<br/>required README sections,<br/>internal links, remote MCP pattern"]
+
+    Pass{"All checks pass?"}
+    Fix["Address the agent's<br/>findings and push fixes"]
+
+    Human["Human admin review<br/>for quality and clarity<br/>(2 to 5 business days)"]
+    Merge(["Merged<br/>Your name lands in<br/>CONTRIBUTORS.md"])
+
+    Idea --> Path
+    Path -- "Yes" --> Code --> Folder --> Files --> PR --> Auto --> Pass
+    Path -- "No" --> NonTech --> Mentor --> PR
+    Pass -- "Yes" --> Human --> Merge
+    Pass -- "No" --> Fix --> Auto
+
+    classDef start fill:#43A047,stroke:#1B5E20,color:#fff
+    classDef step fill:#1E88E5,stroke:#0D47A1,color:#fff
+    classDef gate fill:#FB8C00,stroke:#E65100,color:#fff
+    classDef done fill:#8E24AA,stroke:#4A148C,color:#fff
+
+    class Idea start
+    class Code,Folder,Files,PR,Auto,Human,NonTech,Mentor,Fix step
+    class Path,Pass gate
+    class Merge done

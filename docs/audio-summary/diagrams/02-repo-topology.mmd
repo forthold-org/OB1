@@ -1,0 +1,43 @@
+%% Open Brain repo topology
+%% Where everything lives and whether it is curated or open for contribution.
+
+flowchart TB
+    Root(["OB1 repo root"])
+
+    subgraph Curated["Curated (maintainer approval)"]
+        Ext["extensions/<br/>Six-step learning path"]
+        Prim["primitives/<br/>Reusable concept guides"]
+    end
+
+    subgraph Open["Open for community PRs"]
+        Rec["recipes/<br/>Standalone capability builds"]
+        Sch["schemas/<br/>Database table extensions"]
+        Dash["dashboards/<br/>Frontend templates"]
+        Int["integrations/<br/>Capture sources & MCP extensions"]
+        Skl["skills/<br/>Reusable AI client prompt packs"]
+    end
+
+    subgraph Support["Supporting material"]
+        Docs["docs/<br/>Setup, FAQ, prompts, walkthroughs"]
+        Server["server/<br/>Core MCP server (index.ts)"]
+        Scripts["scripts/<br/>Maintenance tooling"]
+        Resources["resources/<br/>Companion files & exports"]
+    end
+
+    Root --> Curated
+    Root --> Open
+    Root --> Support
+
+    Ext -. references .-> Prim
+    Rec -. can depend on .-> Skl
+    Rec -. can extend .-> Sch
+    Int -. powers .-> Server
+    Dash -. read from .-> Server
+
+    classDef curated fill:#1E88E5,stroke:#0D47A1,color:#fff
+    classDef open fill:#43A047,stroke:#1B5E20,color:#fff
+    classDef support fill:#757575,stroke:#212121,color:#fff
+
+    class Ext,Prim curated
+    class Rec,Sch,Dash,Int,Skl open
+    class Docs,Server,Scripts,Resources support

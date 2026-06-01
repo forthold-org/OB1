@@ -1,0 +1,43 @@
+%% Open Brain extension learning path
+%% Six extensions built in order, with the primitives each one introduces.
+
+flowchart LR
+    Start(["Working Open Brain setup<br/>(database + MCP + capture)"])
+
+    E1["1. Household Knowledge Base<br/><i>Beginner</i><br/>Home facts your agent can recall"]
+    E2["2. Home Maintenance Tracker<br/><i>Beginner</i><br/>Scheduling and history for upkeep"]
+    E3["3. Family Calendar<br/><i>Intermediate</i><br/>Multi-person schedule coordination"]
+    E4["4. Meal Planning<br/><i>Intermediate</i><br/>Recipes, plans, shared grocery lists"]
+    E5["5. Professional CRM<br/><i>Intermediate</i><br/>Contact tracking wired to thoughts"]
+    E6["6. Job Hunt Pipeline<br/><i>Advanced</i><br/>Applications and interview pipeline"]
+
+    P1["Primitive:<br/>Deploy Edge Function"]
+    P2["Primitive:<br/>Remote MCP Connection"]
+    P3["Primitive:<br/>Row Level Security"]
+    P4["Primitive:<br/>Shared MCP Server"]
+
+    Start --> E1 --> E2 --> E3 --> E4 --> E5 --> E6
+
+    P1 -. used by .-> E1
+    P1 -. used by .-> E2
+    P1 -. used by .-> E3
+    P1 -. used by .-> E4
+    P1 -. used by .-> E5
+    P1 -. used by .-> E6
+
+    P2 -. used by .-> E1
+    P2 -. used by .-> E6
+
+    P3 -. introduced in .-> E4
+    P3 -. reused in .-> E5
+    P3 -. reused in .-> E6
+
+    P4 -. introduced in .-> E4
+
+    classDef ext fill:#1E88E5,stroke:#0D47A1,color:#fff
+    classDef prim fill:#FB8C00,stroke:#E65100,color:#fff
+    classDef start fill:#43A047,stroke:#1B5E20,color:#fff
+
+    class E1,E2,E3,E4,E5,E6 ext
+    class P1,P2,P3,P4 prim
+    class Start start
