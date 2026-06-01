@@ -1,0 +1,41 @@
+%% Open Brain — The thoughts table and its sidecars
+%% The core atom plus every schema that attaches to it without modifying it.
+
+flowchart TB
+    subgraph Core["Core (never modified)"]
+        Thoughts[("thoughts<br/><br/>id (uuid)<br/>content (text)<br/>embedding (vector 1536)<br/>metadata (jsonb)<br/>content_fingerprint<br/>created_at, updated_at")]
+    end
+
+    subgraph EnhancedCols["Columns added directly to thoughts"]
+        Enh["enhanced-thoughts:<br/>type, sensitivity_tier,<br/>importance, quality_score,<br/>source_type, enriched"]
+        Prov["provenance-chains:<br/>derived_from (jsonb array),<br/>derivation_method,<br/>derivation_layer,<br/>supersedes (uuid)"]
+        Wf["workflow-status:<br/>status, status_updated_at"]
+    end
+
+    subgraph Sidecars["Sidecar tables (foreign key to thoughts.id)"]
+        AgMem["agent_memories<br/>+ 7 governance sidecars"]
+        Ents["entities + edges<br/>+ thought_entities<br/>+ extraction_queue"]
+        TEdges["thought_edges<br/>(supports, contradicts,<br/>supersedes, depends_on,<br/>evolved_into, related_to)"]
+    end
+
+    Thoughts -.- Enh
+    Thoughts -.- Prov
+    Thoughts -.- Wf
+
+    Thoughts --> AgMem
+    Thoughts --> Ents
+    Thoughts --> TEdges
+
+    Note["Rule: never alter or drop<br/>columns on thoughts.<br/>Adding columns is fine.<br/>Sidecars are how the<br/>model grows."]
+
+    Thoughts -.- Note
+
+    classDef core fill:#1E88E5,stroke:#0D47A1,color:#fff
+    classDef cols fill:#43A047,stroke:#1B5E20,color:#fff
+    classDef side fill:#FB8C00,stroke:#E65100,color:#fff
+    classDef note fill:#757575,stroke:#212121,color:#fff,font-style:italic
+
+    class Thoughts core
+    class Enh,Prov,Wf cols
+    class AgMem,Ents,TEdges side
+    class Note note

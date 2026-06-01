@@ -1,0 +1,101 @@
+%% Open Brain — Agent Memory data model
+%% Seven sidecar tables that govern trust, scope, recall, and audit for agent-written memory.
+
+erDiagram
+    THOUGHTS ||--o{ AGENT_MEMORIES : "wraps"
+    AGENT_MEMORIES ||--o{ AGENT_MEMORY_SOURCE_REFS : "cites"
+    AGENT_MEMORIES ||--o{ AGENT_MEMORY_ARTIFACTS : "references"
+    AGENT_MEMORIES ||--o{ AGENT_MEMORY_RELATIONS : "subject_of"
+    AGENT_MEMORIES ||--o{ AGENT_MEMORY_RELATIONS : "object_of"
+    AGENT_MEMORIES ||--o{ AGENT_MEMORY_REVIEW_ACTIONS : "reviewed_by"
+    AGENT_MEMORY_RECALL_TRACES ||--o{ AGENT_MEMORY_RECALL_ITEMS : "returned"
+    AGENT_MEMORIES ||--o{ AGENT_MEMORY_RECALL_ITEMS : "served_as"
+    AGENT_MEMORIES ||--o{ AGENT_MEMORY_AUDIT_EVENTS : "events_about"
+    AGENT_MEMORY_RECALL_TRACES ||--o{ AGENT_MEMORY_AUDIT_EVENTS : "events_about"
+
+    AGENT_MEMORIES {
+        uuid id PK
+        uuid thought_id FK
+        text workspace_id
+        text project_id
+        text channel_kind
+        text visibility "personal, channel, project, workspace, organization"
+        text memory_type "decision, output, lesson, constraint, open_question, failure, artifact_reference, work_log"
+        text provenance_status "observed, inferred, user_confirmed, imported, generated, superseded, disputed"
+        numeric confidence
+        text created_by "user, agent, system, import"
+        text review_status "pending, confirmed, evidence_only, restricted, rejected, stale, merged"
+        bool can_use_as_instruction "false unless user_confirmed or imported"
+        bool can_use_as_evidence
+        text idempotency_key
+        text content_hash
+    }
+
+    AGENT_MEMORY_SOURCE_REFS {
+        uuid id PK
+        uuid memory_id FK
+        text uri
+        text title
+        timestamptz observed_at
+    }
+
+    AGENT_MEMORY_ARTIFACTS {
+        uuid id PK
+        uuid memory_id FK
+        text artifact_type "code, doc, design"
+        text uri
+        jsonb metadata
+    }
+
+    AGENT_MEMORY_RELATIONS {
+        uuid id PK
+        uuid from_memory_id FK
+        uuid to_memory_id FK
+        text relation "related_to, supersedes, superseded_by, conflicts_with, merged_into"
+    }
+
+    AGENT_MEMORY_REVIEW_ACTIONS {
+        uuid id PK
+        uuid memory_id FK
+        text action "confirm, edit, evidence_only, restrict_scope, mark_stale, merge, reject, dispute, supersede"
+        text actor_id
+        jsonb before
+        jsonb after
+        timestamptz created_at "append-only"
+    }
+
+    AGENT_MEMORY_RECALL_TRACES {
+        uuid id PK
+        uuid request_id
+        text workspace_id
+        text project_id
+        text runtime_name
+        text task_id
+        text flow_id
+        text query
+        jsonb request_payload
+        jsonb response_policy
+    }
+
+    AGENT_MEMORY_RECALL_ITEMS {
+        uuid id PK
+        uuid trace_id FK
+        uuid memory_id FK
+        int rank
+        numeric similarity
+        numeric ranking_score
+        bool returned
+        bool used
+        text ignored_reason
+        jsonb use_policy_snapshot
+    }
+
+    AGENT_MEMORY_AUDIT_EVENTS {
+        uuid id PK
+        text event_type "recall_requested, memory_returned, memory_used, memory_ignored, memory_written, memory_confirmed, memory_edited, memory_rejected, memory_superseded, memory_disputed"
+        text workspace_id
+        uuid memory_id FK
+        uuid trace_id FK
+        text actor_kind "user, agent, system, import"
+        jsonb payload
+    }

@@ -1,0 +1,50 @@
+%% Open Brain — Provenance chains, supersession, and workflow status
+%% How derivation lineage and lifecycle states are modeled.
+
+flowchart TB
+    subgraph ProvenanceExample["Provenance: derivation lineage"]
+        A1["Atomic thought A<br/>derivation_layer = primary<br/>derived_from = null"]
+        A2["Atomic thought B<br/>derivation_layer = primary<br/>derived_from = null"]
+        A3["Atomic thought C<br/>derivation_layer = primary<br/>derived_from = null"]
+        D1["Derived thought D<br/>(weekly digest)<br/>derivation_layer = derived<br/>derivation_method = synthesis<br/>derived_from = [A, B, C]"]
+        D2["Derived thought D-prime<br/>(updated digest)<br/>derived_from = [A, B, C]<br/>supersedes = D"]
+
+        A1 --> D1
+        A2 --> D1
+        A3 --> D1
+        D1 -.->|supersedes| D2
+    end
+
+    subgraph WorkflowStates["Workflow status state machine"]
+        S1["new"] --> S2["planning"]
+        S2 --> S3["active"]
+        S3 --> S4["review"]
+        S4 --> S5["done"]
+        S5 --> S6["archived"]
+
+        S1 -.-> S3
+        S3 -.-> S5
+        S4 -.-> S3
+
+        WfNote["status is null<br/>for non-task types"]
+    end
+
+    subgraph TraceHelpers["Helper RPCs (service-role only)"]
+        H1["trace_provenance(thought_id)<br/>walk upward through derived_from<br/>with cycle detection and depth cap"]
+        H2["find_derivatives(thought_id)<br/>reverse lookup via GIN containment<br/>restricted rows hard-filtered out"]
+        H3["merge_thought_provenance_metadata<br/>race-free server-side merge<br/>solves concurrent metadata writes"]
+    end
+
+    ProvenanceExample -.- TraceHelpers
+
+    classDef atomic fill:#43A047,stroke:#1B5E20,color:#fff
+    classDef derived fill:#FB8C00,stroke:#E65100,color:#fff
+    classDef state fill:#1E88E5,stroke:#0D47A1,color:#fff
+    classDef helper fill:#8E24AA,stroke:#4A148C,color:#fff
+    classDef note fill:#757575,stroke:#212121,color:#fff,font-style:italic
+
+    class A1,A2,A3 atomic
+    class D1,D2 derived
+    class S1,S2,S3,S4,S5,S6 state
+    class H1,H2,H3 helper
+    class WfNote note

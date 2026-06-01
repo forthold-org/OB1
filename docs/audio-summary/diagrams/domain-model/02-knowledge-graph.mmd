@@ -1,0 +1,69 @@
+%% Open Brain — Entity knowledge graph and typed reasoning edges
+%% How thoughts, entities, and their relationships fit together.
+
+erDiagram
+    THOUGHTS ||--o{ THOUGHT_ENTITIES : "mentions"
+    ENTITIES ||--o{ THOUGHT_ENTITIES : "appears_in"
+    ENTITIES ||--o{ EDGES : "subject_of"
+    ENTITIES ||--o{ EDGES : "object_of"
+    THOUGHTS ||--o{ THOUGHT_EDGES : "from"
+    THOUGHTS ||--o{ THOUGHT_EDGES : "to"
+    THOUGHTS ||--|| ENTITY_EXTRACTION_QUEUE : "enqueued_for"
+
+    THOUGHTS {
+        uuid id PK
+        text content
+        vector embedding
+        jsonb metadata
+    }
+
+    ENTITIES {
+        bigserial id PK
+        text entity_type "person, project, topic, tool, org, place"
+        text canonical_name
+        text normalized_name "lowercased, trimmed"
+        jsonb aliases
+        timestamptz first_seen_at
+        timestamptz last_seen_at
+    }
+
+    THOUGHT_ENTITIES {
+        uuid thought_id FK
+        bigint entity_id FK
+        text mention_role "mentioned, subject, author"
+        numeric confidence
+        jsonb evidence
+    }
+
+    EDGES {
+        bigserial id PK
+        bigint from_entity_id FK
+        bigint to_entity_id FK
+        text relation "co_occurs_with, works_on, uses, related_to, member_of, located_in"
+        int support_count
+        numeric confidence
+        timestamptz valid_from
+        timestamptz valid_until
+        numeric decay_weight
+    }
+
+    THOUGHT_EDGES {
+        bigserial id PK
+        uuid from_thought_id FK
+        uuid to_thought_id FK
+        text relation "supports, contradicts, supersedes, depends_on, evolved_into, related_to"
+        numeric confidence
+        numeric decay_weight
+        timestamptz valid_from
+        timestamptz valid_until
+        text classifier_version
+        int support_count
+    }
+
+    ENTITY_EXTRACTION_QUEUE {
+        uuid thought_id PK
+        text status "pending, processing, complete, failed, skipped"
+        int attempt_count
+        text source_fingerprint
+        timestamptz processed_at
+    }
