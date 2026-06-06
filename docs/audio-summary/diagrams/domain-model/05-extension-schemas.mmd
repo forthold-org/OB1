@@ -2,18 +2,18 @@
 %% The user-facing schemas added by each of the six learning-path extensions.
 
 flowchart TB
-    subgraph Ext1["1. Household Knowledge"]
+    subgraph Ext1["1 —Household Knowledge"]
         H1["household_items<br/>(name, category, location,<br/>details jsonb, notes)"]
         H2["household_vendors<br/>(name, service_type,<br/>contact, rating, last_used)"]
     end
 
-    subgraph Ext2["2. Home Maintenance"]
+    subgraph Ext2["2 —Home Maintenance"]
         M1["maintenance_tasks<br/>(name, frequency_days,<br/>last_completed, next_due,<br/>priority)"]
         M2["maintenance_logs<br/>(task_id, completed_at,<br/>performed_by, cost,<br/>next_action)"]
         M1 -->|"trigger updates<br/>last_completed,<br/>next_due"| M2
     end
 
-    subgraph Ext3["3. Family Calendar"]
+    subgraph Ext3["3 —Family Calendar"]
         F1["family_members<br/>(name, relationship,<br/>birth_date)"]
         F2["activities<br/>(family_member_id,<br/>type, recurring or range,<br/>start/end time)"]
         F3["important_dates<br/>(family_member_id, title,<br/>date_value, recurring_yearly,<br/>reminder_days_before)"]
@@ -21,14 +21,14 @@ flowchart TB
         F1 --> F3
     end
 
-    subgraph Ext4["4. Meal Planning"]
+    subgraph Ext4["4 —Meal Planning"]
         ML1["recipes<br/>(name, cuisine, ingredients jsonb,<br/>instructions jsonb, tags, rating)"]
         ML2["meal_plans<br/>(week_start, day_of_week,<br/>meal_type, recipe_id,<br/>custom_meal, servings)"]
         ML3["shopping_lists<br/>(week_start, items jsonb<br/>with purchased flag)"]
         ML1 --> ML2
     end
 
-    subgraph Ext5["5. Professional CRM"]
+    subgraph Ext5["5 —Professional CRM"]
         C1["professional_contacts<br/>(name, company, title,<br/>contact info, tags,<br/>last_contacted, follow_up_date,<br/>fts tsvector)"]
         C2["contact_interactions<br/>(contact_id, type,<br/>occurred_at, summary,<br/>follow_up_needed)"]
         C3["opportunities<br/>(contact_id, stage,<br/>value, expected_close_date)"]
@@ -36,7 +36,7 @@ flowchart TB
         C1 --> C3
     end
 
-    subgraph Ext6["6. Job Hunt Pipeline"]
+    subgraph Ext6["6 —Job Hunt Pipeline"]
         J1["companies<br/>(name, industry,<br/>remote_policy, size)"]
         J2["job_postings<br/>(company_id, title,<br/>salary range, requirements,<br/>source)"]
         J3["applications<br/>(job_posting_id, status,<br/>applied_date, response_date)"]
